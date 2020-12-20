@@ -100,14 +100,13 @@ def get_all_comments(group_domain, date_bound, keyword_list):
 # Точка входа в модуль
 if __name__ == '__main__':  # начало выполнения программы
     with codecs.open('keywords.txt', encoding='cp1251') as file:  # открываю файл с ключевыми словами
-        keywords = file.readlines()  # считываю все строчки из файла => ['дистанционное\n', '...\n', ...]
-    keywords = [keyword.strip() for keyword in keywords]  # удаляю \n => ['дистанционное', '...', ...]
+        keywords = file.readlines()  # считываю все строчки из файла
+    keywords = [keyword.strip() for keyword in keywords]  # удаляю \n
 
     for group_uri in group_list:  # соберу данные по каждой группе
         print('Группа: ', group_uri)  # вывожу адрес текущей группы
         all_comments = get_all_comments(group_uri, datetime(2020, 2, 1), keywords)  # вызываю метод получения всех
         # комментариев, указываю дату верхней границы времени, передаю список ключевых слов
-        # => all_comments = [{'text': 'Текст1', 'date': 123356477}, {'text': 'Текст2', 'date': 12334543}, ...]
 
         # инициализирую модуль Достоевского
         tokenizer = RegexTokenizer()
@@ -116,7 +115,6 @@ if __name__ == '__main__':  # начало выполнения программ
         comments_text = [comment['text'] for comment in all_comments]  # получаю список, содержащий только текст
         # комментариев
         results = model.predict(comments_text)  # произвожу анализ Достоевским
-        # => results = [{'positive': 0.647, 'negative': 0.123, ...}, ...]
 
         comments_df = pd.DataFrame(columns=['Год', 'Месяц', 'Комментарий', 'Позитивность', 'Негативность'])  # создаю
         # датафрейм для агрегации данных по комментариям
@@ -124,7 +122,6 @@ if __name__ == '__main__':  # начало выполнения программ
         for comment, sentiment in zip(all_comments, results):  # склеиваю списки с комментариями и результатом
             # работы Довстоевского
             comment_date = datetime.fromtimestamp(comment['date'])  # получаю дату из таймштампа
-            # => 1234565675 => datetime(2020, 2, ...)
             year = comment_date.year  # получаю год комментария
             month = comment_date.month  # получаю месяц комментария
             comment_date = date(year, month, 1)  # создаю дату начала месяца
@@ -141,7 +138,6 @@ if __name__ == '__main__':  # начало выполнения программ
         coefficients_df = pd.DataFrame(columns=['Год', 'Месяц', 'Позитивность', 'Негативность'])  # создаю
         # датафрейм для агрегации данных по коэффициентам
         tonality_coefficients = {}  # создаю словарь для хранения коэффициентов тональности по месяцам
-        # levels = {'date(2020, 2, 1)': {'positive': [0.123, 0.321, ...], 'negative': [0.845, 0.111, ...]}, ...}
         for comment_date, sentiments in levels.items():
             negative_level = sum(sentiments['negative']) / len(sentiments['negative'])  # считаю среднее по негативу
             positive_level = sum(sentiments['positive']) / len(sentiments['positive'])  # считаю среднее по позитиву
