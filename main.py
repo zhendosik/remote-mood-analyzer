@@ -135,7 +135,7 @@ if __name__ == '__main__':  # начало выполнения программ
                              columns=['Год', 'Месяц', 'Комментарий', 'Позитивность', 'Негативность']),
                 ignore_index=True)  # игнорирую индекс 0 из нового датафрейма
 
-        coefficients_df = pd.DataFrame(columns=['Год', 'Месяц', 'Позитивность', 'Негативность'])  # создаю
+        coefficients_df = pd.DataFrame(columns=['Год', 'Месяц', 'Позитивность', 'Негативность', 'Тональность'])  # создаю
         # датафрейм для агрегации данных по коэффициентам
         tonality_coefficients = {}  # создаю словарь для хранения коэффициентов тональности по месяцам
         for comment_date, sentiments in levels.items():
@@ -145,9 +145,10 @@ if __name__ == '__main__':  # начало выполнения программ
             # тональности
             # формирую датафрейм для текущего комментария и добавляю его в агрегирующий
             coefficients_df = coefficients_df.append(
-                pd.DataFrame([[comment_date.year, comment_date.month, negative_level, positive_level]],
-                             columns=['Год', 'Месяц', 'Позитивность', 'Негативность']), ignore_index=True)  # игнорирую
-            # индекс 0 из нового датафрейма
+                pd.DataFrame([[comment_date.year, comment_date.month, negative_level, positive_level,
+                               tonality_coefficients[comment_date]]], columns=['Год', 'Месяц', 'Позитивность',
+                                                                               'Негативность', 'Тональность']),
+                ignore_index=True)  # игнорирую индекс 0 из нового датафрейма
 
         keys = list(tonality_coefficients.keys())  # получаю список дат
         values = list(tonality_coefficients.values())  # получаю список коэффициентов
